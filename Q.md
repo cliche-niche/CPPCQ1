@@ -1,12 +1,12 @@
 ## **Take Home**
-Professor MA being a maverick has given your class a take home end-semester examination. There are _k_ questions in the end-semester exam and they are worth different marks. There are _n_ students in the class, with each person having at least _1_ friend and at most _f_ friends.
+Professor MA being a maverick has given your class a take home end-semester examination. There are _k_ questions in the end-semester exam and they are worth different marks. There are _n_ students in the class, with each person having at least _1_ friend (if _n>1_) and at most _f_ friends.
 
 Prof. MA knows about this, and makes a couple of assumptions. He assumes that if _A_ and _B_ are friends, and _A_ and _C_ are friends, then none of them do the same question, and _B_ and _C_ are not friends. He also assumes that each student will attempt to solve only one question, because they know everyone is getting an `A` grade anyway.
 
 Under these assumptions, he wants to know the maximum cumulative score the class can get, but since he is so busy, he asks for your help. Can you help him?
 
 ### **Input**
-The first line contains three integers, _n_, _f_, and _k_ (_1 &le; n &le; 2*10<sup>4</sup>_, _1 &le; f &le; 4_, _1 &le; k &le; 10_), the number of students, maximum number of friends one can have, and the total number of questions, respectively.
+The first line contains three integers, _n_, _f_, and _k_ (_1 &le; n &le; 5&sdot;10<sup>3</sup>_, _2 &le; f &le; 4_, _f < k &le; 10_), the number of students, maximum number of friends one can have, and the total number of questions, respectively.
 
 The next _n-1_ lines contain two integers _u_ and _v_ (_1 &le; u, v &le; n_), meaning that students with these roll numbers are friends.
 

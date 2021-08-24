@@ -21,10 +21,12 @@ using namespace std;
 Code for solving.
 ****************/
 
-bool v[10000];
+bool v[5000];
 int w[10];
+int s[5000][10][10];
+vector < vector<int> > a;
 
-int optk(int x, set<int> (&sn), set<int> (&sk), vector< vector<int> > (&a), vector < vector<int> > (&s), int k){
+int optk(int x, set<int> (&sn), set<int> (&sk), int k, int jp){
 
     bool done=1; int cn;
 
@@ -46,7 +48,7 @@ int optk(int x, set<int> (&sn), set<int> (&sk), vector< vector<int> > (&a), vect
     for(int i=0; i<k; i++){
         if(sk.find(i)==sk.end()){
             sk.insert(i);
-            m = max(m, s[cn][i]+optk(x, sn, sk, a, s, k));
+            m = max(m, s[cn][jp][i]+optk(x, sn, sk, k, jp));
             sk.erase(sk.find(i));
         }
     }
@@ -56,17 +58,27 @@ int optk(int x, set<int> (&sn), set<int> (&sk), vector< vector<int> > (&a), vect
     return m;
 }
 
-void dfs(int x, vector< vector<int> > (&a), vector < vector<int> > (&s), int k, int p){
+void dfs(int x, int k, int p){
     v[x]=1;
 
     for(int i=0; i<k; i++){
-        s[x][i]=w[i];
+        if(x==p){
+            s[x][i][i]=w[i];
+            continue;
+        }
+        for(int j=0; j<k; j++){
+            if(i==j){
+                s[x][i][j]=0;
+            }else{
+                s[x][i][j]=w[j];
+            }
+        }
     }
 
     bool leaf=1;
     for(auto i:a[x]){
         if(!v[i]){
-            dfs(i, a, s, k, x);
+            dfs(i, k, x);
             leaf=0;
         }
     }
@@ -79,7 +91,19 @@ void dfs(int x, vector< vector<int> > (&a), vector < vector<int> > (&s), int k, 
     set <int> sn, sk; sn.insert(p);
     for(int i=0; i<k; i++){
         sk.insert(i);
-        s[x][i] += optk(x, sn, sk, a, s, k);
+        
+        if(x==p){
+            s[x][i][i] += optk(x, sn, sk, k, i);
+        }else{
+            for(int j=0; j<k; j++){
+                if(j!=i){
+                    sk.insert(j);
+                    s[x][i][j] += optk(x, sn, sk, k, j);
+                    sk.erase(sk.find(j));
+                }
+            }
+        }
+
         sk.erase(sk.find(i));
     }
     return;
@@ -94,11 +118,11 @@ void solve(void){
     cin>>n>>f>>k;
     cout<<n<<' '<<f<<' '<<k<<'\n'; //input related
 
-    vector < vector<int> > a(n); v[0]=0;
+    a.resize(n); v[0]=0;
     for(int i=0; i<n-1; i++){
         cin>>x>>y;
         cout<<x<<' '<<y<<'\n'; //input related
-        x--; y--;
+        x--; y--; //converting to 0 based indexing
         a[x].push_back(y); a[y].push_back(x);
         v[i+1]=0;
     }
@@ -109,16 +133,12 @@ void solve(void){
         cout<<w[i]<<' '; //input related
     }
 
-    vector < vector<int> > s(n);
-    for(int i=0; i<n; i++){
-        s[i].resize(k);
-    }
-
-    dfs(0, a, s, k, 0);
+    int ROOT=0;
+    dfs(ROOT, k, ROOT);
 
     int m=0;
     for(int i=0; i<k; i++){
-        m = max(m, s[0][i]);
+        m = max(m, s[ROOT][i][i]);
     }
 
     cout<<"\n\n\n"<<m; //output related
@@ -134,7 +154,7 @@ void solve(void){
 Code for generating input.
 *************************/
 
-#define NMAX 20000
+#define NMAX 5000
 #define FMAX 4
 #define KMAX 10
 
@@ -144,8 +164,8 @@ void gen(void){
 
     srand(time(0));
     int n = 1+(rand())%NMAX;
-    int f = 1+(rand())%FMAX;
-    int k = 1+(rand())%KMAX;
+    int f = 2+(rand())%(FMAX-1);
+    int k = (1+f)+(rand())%(KMAX-f);
     int u, v;
 
     cout<<n<<' '<<f<<' '<<k<<'\n';
@@ -154,20 +174,19 @@ void gen(void){
     map <int, int> m;
 
     //Printing edges/ friendships.
-    for(int PAIRS=n-1; PAIRS;){
-        u = 1+(rand())%n;
-        v = 1+(rand())%n;
+    for(u=2; u<=n;){
+        v = 1+(rand())%(u-1);
         if(u!=v && m[u]<f && m[v]<f && s.find(make_pair(min(u, v), max(u, v)))==s.end()){
-            m[u]++; m[v]++; 
-            PAIRS--; 
+            m[u]++; m[v]++;
             s.insert(make_pair(min(u, v), max(u, v)));
             cout<<u<<' '<<v<<'\n';
+            u++;
         }
     }
 
     //Printing marks for a question.
     for(int i=0; i<k; i++){
-        cout<<1+(rand())%1000<<' ';
+        cout<<1+(rand()%1000)<<' ';
     }
 
     fclose(stdout);
